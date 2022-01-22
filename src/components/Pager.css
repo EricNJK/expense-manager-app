@@ -1,0 +1,33 @@
+a {
+    text-decoration: none;
+}
+
+p, li, a {
+    font-size: 12px;
+}
+
+.container {
+    width: 720px;
+    max-width: 340px;
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
+}
+
+.pagination {
+    padding: 14px 0;
+}
+
+.p1 a {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0;
+    text-align: center;
+}
+
+.p1 a.is-active {
+    background-color: #887cb8;
+    border-radius: 25%;
+    color: #fff;
+}

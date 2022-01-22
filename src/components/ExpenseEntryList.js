@@ -7,11 +7,14 @@ class ExpenseEntryList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: props.items
+            items: props.items,
+            onDelete: props.onDelete.bind()
         }
 
         this.handleMouseEnter = this.handleMouseEnter.bind();
         this.handleMouseLeave = this.handleMouseLeave.bind();
+        //this.props.onDelete= this.props.onDelete.bind(); props is read only!
+        //this.handleDelete = this.handleDelete.bind();
     }
 
     render() {
@@ -21,9 +24,7 @@ class ExpenseEntryList extends React.Component {
                 <td><FormattedMoney value={item.amount} /></td>
                 <td><FormattedDate value={item.spendDate} /></td>
                 <td>{item.category}</td>
-                <td><button onClick={(e) => {
-                    this.handleDelete(item.id);
-                }}>Remove</button></td>
+                <td><button onClick={this.handleDelete.bind(this, item.id)}>Remove</button></td>
             </tr>)
         });
 
@@ -63,13 +64,10 @@ class ExpenseEntryList extends React.Component {
     // event handlers
     handleDelete(item_id, e) {
         console.log("handleDelete: " + item_id);
-        this.setState((state, props) => {
-            return {
-                items: state.items.filter(item => {
-                    return item.id !== item_id;
-                })
-            };
-        });
+
+        if (this.state.onDelete != null) {
+            this.state.onDelete(item_id, e);
+        }
     }
 
     handleMouseEnter(e) {
@@ -80,20 +78,23 @@ class ExpenseEntryList extends React.Component {
         e.target.parentNode.classList.remove("highlight")
     }
 
-    /*
+
     // lifecycle: before & after mounting
     // constructor
-    componentDidMount() { console.log("ExpenseEntryItemList - componentDidMount") }
+    //componentDidMount() { console.log("ExpenseEntryItemList - componentDidMount") }
 
     // lifecycle: before, during and after updating
-    shouldComponentUpdate(nextProps, nextState) { return true }// boolean
-    static getDerivedStateFromProps(props, state) { return null }
-    getSnapshotBeforeUpdate(prevProps, prevState) { return null }
-    componentDidUpdate(prevProps, prevState, snapshot) { }
+    //shouldComponentUpdate(nextProps, nextState) { return true }// boolean
+    static getDerivedStateFromProps(props, state) {
+        return {
+            items: props.items
+        };
+    }
+    //getSnapshotBeforeUpdate(prevProps, prevState) { return null }
+    //componentDidUpdate(prevProps, prevState, snapshot) { }
 
     // lifecycle: before unmounting
-    componentWillUnmount() { }
-    */
+    //componentWillUnmount() { }
 }
 
 export default ExpenseEntryList;

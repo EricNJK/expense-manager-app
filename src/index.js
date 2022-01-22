@@ -4,6 +4,7 @@ import './index.css';
 import ExpenseEntryList from './components/ExpenseEntryList';
 import * as serviceWorker from './serviceWorker';
 import ExpenseEntryItemListFn from './components/ExpenseEntryItemListFn';
+import Pager from './components/Pager';
 import Clock from './components/Clock';
 
 const items_src = [
@@ -19,26 +20,20 @@ const items_src = [
   { id: 10, name: "Exam Fees", amount: 1245, spendDate: "2020-11-04", category: "Academic" }
 ]
 
-ReactDOM.render(
-  <React.StrictMode>
-    <ExpenseEntryItemListFn
-      items={items_src}
-      header={<h1>Expense Manager</h1>}
-      footer={<div style={{ textAlign: "left" }}>
-        <p style={{fontSize: 12}}>Sample application</p>
-      </div>} />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const pageCount = 3;  // items per page
 
-/*
 ReactDOM.render(
   <React.StrictMode>
-    <ExpenseEntryList items={items_src} />
+    <Pager
+      items={items_src}
+      pageCount={pageCount}
+      render={
+        (pagerState) => (<div><ExpenseEntryList items={pagerState.items} onDelete={pagerState.deleteHandler} /></div>)
+      }
+    />
   </React.StrictMode>,
   document.getElementById('root')
 );
-*/
 
 ReactDOM.render(
   <React.StrictMode>

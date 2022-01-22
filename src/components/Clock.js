@@ -15,7 +15,7 @@ function Clock() {
 
     useEffect(() => {
         let setTime = () => {
-            console.log("clock: setTime \'effect\' called")
+            console.log("clock: setTime 'effect' called")
             setCurrentTime(new Date())
         }
         let interval = setInterval(setTime, 1000);
