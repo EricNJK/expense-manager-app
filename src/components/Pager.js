@@ -48,7 +48,7 @@ class Pager extends React.Component {
 
     handleDelete(id, e) {
         e.preventDefault();
-        console.log("Deleting id: " + id) ;
+        console.log("Deleting id: " + id);
 
         this.setState((prevState, _p) => {
             return {
@@ -74,7 +74,7 @@ class Pager extends React.Component {
             return (
                 <a href="#" key={index} onClick={this.handleClick.bind(this, index)}
                     className={(index == this.state.currentPage) ? "is-active" : ""}>
-                    <li>{index}</li>
+                    {index}
                 </a>
             )
         });

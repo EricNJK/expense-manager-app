@@ -6,6 +6,9 @@ import FormattedMoney from "./FormattedMoney";
 class ExpenseEntryList extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            
+        }
 
         this.handleMouseEnter = this.handleMouseEnter.bind(this);
         this.handleMouseLeave = this.handleMouseLeave.bind(this);

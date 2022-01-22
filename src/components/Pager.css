@@ -22,8 +22,9 @@ p, li, a {
     width: 30px;
     height: 30px;
     line-height: 30px;
-    padding: 0;
+    margin-right: 5px;
     text-align: center;
+    font-size: 14px;
 }
 
 .p1 a.is-active {
