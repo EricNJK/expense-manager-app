@@ -6,13 +6,9 @@ import FormattedMoney from "./FormattedMoney";
 class ExpenseEntryList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            items: props.items,
-            onDelete: props.onDelete.bind()
-        }
 
-        this.handleMouseEnter = this.handleMouseEnter.bind();
-        this.handleMouseLeave = this.handleMouseLeave.bind();
+        this.handleMouseEnter = this.handleMouseEnter.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
         //this.props.onDelete= this.props.onDelete.bind(); props is read only!
         //this.handleDelete = this.handleDelete.bind();
     }
@@ -24,7 +20,7 @@ class ExpenseEntryList extends React.Component {
                 <td><FormattedMoney value={item.amount} /></td>
                 <td><FormattedDate value={item.spendDate} /></td>
                 <td>{item.category}</td>
-                <td><button onClick={this.handleDelete.bind(this, item.id)}>Remove</button></td>
+                <td><button onClick={this.props.onDelete.bind(this, item.id)}>Remove</button></td>
             </tr>)
         });
 
@@ -65,8 +61,8 @@ class ExpenseEntryList extends React.Component {
     handleDelete(item_id, e) {
         console.log("handleDelete: " + item_id);
 
-        if (this.state.onDelete != null) {
-            this.state.onDelete(item_id, e);
+        if (this.props.onDelete != null) {
+            this.props.onDelete(item_id, e);
         }
     }
 

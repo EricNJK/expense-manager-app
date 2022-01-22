@@ -81,7 +81,7 @@ class Pager extends React.Component {
 
         let propsToPass = {
             items: this.state.itemsToShow,
-            deleteHandler: this.handleDelete
+            deleteHandler: this.handleDelete.bind(this)
         }
 
         return (
