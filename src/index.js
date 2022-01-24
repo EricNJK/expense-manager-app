@@ -1,9 +1,8 @@
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import ExpenseEntryList from './components/ExpenseEntryList';
+import ExpenseEntryListMui from './components/ExpenseEntryListMui';
 import * as serviceWorker from './serviceWorker';
-import ExpenseEntryItemListFn from './components/ExpenseEntryItemListFn';
 import Pager from './components/Pager';
 import Clock from './components/Clock';
 
@@ -28,7 +27,7 @@ ReactDOM.render(
       items={items_src}
       pageCount={pageCount}
       render={
-        (pagerState) => (<div><ExpenseEntryList items={pagerState.items} onDelete={pagerState.deleteHandler} /></div>)
+        (pagerState) => (<div><ExpenseEntryListMui items={pagerState.items} onDelete={pagerState.deleteHandler} /></div>)
       }
     />
   </React.StrictMode>,

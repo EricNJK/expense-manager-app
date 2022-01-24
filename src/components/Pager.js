@@ -90,9 +90,9 @@ class Pager extends React.Component {
                 <div className="container">
                     <div className="pagination p1">
                         <ul>
-                            {this.state.hasPreviousPage ? <a href="#" onClick={this.handleClick.bind(this, this.state.currentPage - 1)}>{"<"}</a> : <span></span>}
+                            {this.state.hasPreviousPage ? <a href="#" onClick={this.handleClick.bind(this, this.state.currentPage - 1)}>{"<Previous"}</a> : <span></span>}
                             {pages}
-                            {this.state.hasNextPage ? <a href="#" onClick={this.handleClick.bind(this, this.state.currentPage + 1)}>{">"}</a> : <span></span>}
+                            {this.state.hasNextPage ? <a href="#" onClick={this.handleClick.bind(this, this.state.currentPage + 1)}>{"Next>"}</a> : <span></span>}
                         </ul>
                     </div>
                 </div>
