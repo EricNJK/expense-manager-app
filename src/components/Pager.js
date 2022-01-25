@@ -5,15 +5,26 @@ class Pager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: props.items,
+            isLoaded: false,
+            items: [],
             pageCount: props.pageCount
         }
-        this.state = this.calculate(this.state, 1);
     }
 
-    calculate(state, pageNo) {
+    calculate(state, pageNo, remoteItems) {
+        let newState = {
+            pageCount: state.pageCount,
+            items: (remoteItems ? remoteItems : state.items),
+            isLoaded: state.isLoaded
+        }
+
         let currentPageNum = pageNo;
-        let totalPages = Math.ceil(state.items.length / state.pageCount);
+
+        let totalPages = 0;
+        if (newState.items)
+            totalPages = Math.ceil(newState.items.length / newState.pageCount);
+        else
+            totalPages = Math.ceil(newState.items.length / newState.pageCount);
 
         if (pageNo > totalPages)  // limit page number
             currentPageNum = totalPages;
@@ -21,21 +32,17 @@ class Pager extends React.Component {
         let hasPreviousPage = (currentPageNum != 1);  // only 1st page doesn't have previous
         let hasNextPage = (currentPageNum < totalPages)
 
-        let firstIndex = (currentPageNum - 1) * state.pageCount
-        let last = firstIndex + state.pageCount
+        let firstIndex = (currentPageNum - 1) * newState.pageCount
+        let last = firstIndex + newState.pageCount
 
-        let itemsToShow = state.items.slice(firstIndex, last)
+        let itemsToShow = newState.items.slice(firstIndex, last)
 
-        let newState = {
-            pageCount: state.pageCount,
-            items: state.items,
+        newState.itemsToShow = itemsToShow
+        newState.currentPage = currentPageNum
+        newState.totalPages = totalPages
+        newState.hasPreviousPage = hasPreviousPage
+        newState.hasNextPage = hasNextPage
 
-            itemsToShow: itemsToShow,
-            currentPage: currentPageNum,
-            totalPages: totalPages,
-            hasPreviousPage: hasPreviousPage,
-            hasNextPage: hasNextPage
-        }
         return newState;
     }
 
@@ -49,22 +56,11 @@ class Pager extends React.Component {
     handleDelete(id, e) {
         e.preventDefault();
         console.log("Deleting id: " + id);
-
-        this.setState((prevState, _p) => {
-            return {
-                items: prevState.items.filter((item) => {
-                    return item.id != id
-                })
-            }
-        });
-
-        this.setState((prevState, _p) => {
-            return this.calculate(prevState, prevState.currentPage)
-        })
+        this.deleteRemoteItem(id);
     }
 
     render() {
-        let pageNumberArray = new Array();
+        let pageNumberArray = [];
 
         let i = 1;
         for (; i <= this.state.totalPages; i++) {
@@ -81,12 +77,13 @@ class Pager extends React.Component {
 
         let propsToPass = {
             items: this.state.itemsToShow,
+            isLoaded: this.state.isLoaded,
             deleteHandler: this.handleDelete.bind(this)
         }
 
         return (
             <div>
-                {this.props.render(propsToPass)}
+                {this.props.renderList(propsToPass)}
                 <div className="container">
                     <div className="pagination p1">
                         <ul>
@@ -98,6 +95,47 @@ class Pager extends React.Component {
                 </div>
             </div>
         );
+    }
+
+    // Load from 'apiserver'
+    BASE_URL = "http://localhost:8000";
+    fetchRemoteItems() {
+        console.log("fetchRemoteItems...");
+        fetch(this.BASE_URL + "/api/expenses")
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.expenses) {
+                    this.setItems(resp.expenses)
+                }
+            })
+    }
+
+    setItems(remoteItems) {
+        this.setState((s, p) => this.calculate(s, 1, remoteItems));
+        this.setState((_s, _p) => {
+            return {
+                isLoaded: true
+            }
+        });
+    }
+
+    // lifecycle: Mounted
+    componentDidMount() {
+        this.fetchRemoteItems()
+    }
+
+    deleteRemoteItem(id) {
+        fetch(this.BASE_URL + "/api/expense/" + id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(() => { this.fetchRemoteItems() },
+                (reason) => {
+                    console.log("deleteRemoteItem error", reason);
+                    this.setState((_s, _p) => {
+                        return {
+                            isLoaded: false
+                        }
+                    });
+                });
     }
 }
 

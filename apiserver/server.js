@@ -70,7 +70,7 @@ app.post("/api/expense/", (req, res, next) => {
             } else {
                 // return new document with _id
                 // Created 201
-                res.status(201).json({ expenses: insertedDoc })
+                res.status(201).json({ expenses: [insertedDoc] })
             }
         })
     }

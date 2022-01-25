@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import Pager from './components/Pager';
 import Clock from './components/Clock';
 
+/*
 const items_src = [
   { id: 1, name: "Pizza", amount: 80, spendDate: "2020-10-10", category: "Food" },
   { id: 2, name: "Grape Juice", amount: 30, spendDate: "2020-10-12", category: "Food" },
@@ -18,16 +19,20 @@ const items_src = [
   { id: 9, name: "Mobile", amount: 3500, spendDate: "2020-11-02", category: "Gadgets" },
   { id: 10, name: "Exam Fees", amount: 1245, spendDate: "2020-11-04", category: "Academic" }
 ]
+*/
 
 const pageCount = 3;  // items per page
 
 ReactDOM.render(
   <React.StrictMode>
     <Pager
-      items={items_src}
       pageCount={pageCount}
-      render={
-        (pagerState) => (<div><ExpenseEntryListMui items={pagerState.items} onDelete={pagerState.deleteHandler} /></div>)
+      renderList={
+        (pagerState) => (<div>
+          <ExpenseEntryListMui items={pagerState.items}
+            onDelete={pagerState.deleteHandler}
+            isLoaded={pagerState.isLoaded} />
+        </div>)
       }
     />
   </React.StrictMode>,
@@ -53,12 +58,3 @@ setTimeout(() => {
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
-
-function scratch() {
-  console.log(items_src.reduce(getTotalByReduce, 0));
-
-  function getTotalByReduce(accumulated, currentValue, currentIndex) {
-    return accumulated += currentValue.amount;
-  }
-};
-scratch();

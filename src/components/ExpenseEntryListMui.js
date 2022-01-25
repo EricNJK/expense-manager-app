@@ -32,16 +32,20 @@ class ExpenseEntryListMui extends React.Component {
             }
         }))(TableCell);
 
-        let expense_rows = this.state.items.map((item) => {
-            return (
-                <StyledTableRow key={item.id} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-                    <StyledTableCell>{item.name}</StyledTableCell>
-                    <StyledTableCell><FormattedMoney value={item.amount} /></StyledTableCell>
-                    <StyledTableCell><FormattedDate value={item.spendDate} /></StyledTableCell>
-                    <StyledTableCell>{item.category}</StyledTableCell>
-                    <StyledTableCell><button onClick={this.props.onDelete.bind(this, item.id)}>Remove</button></StyledTableCell>
-                </StyledTableRow>)
-        });
+        let expense_rows = [];
+
+        if (this.props.isLoaded) {
+            expense_rows = this.state.items.map((item) => {
+                return (
+                    <StyledTableRow key={item._id} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+                        <StyledTableCell>{item.name}</StyledTableCell>
+                        <StyledTableCell><FormattedMoney value={item.amount} /></StyledTableCell>
+                        <StyledTableCell><FormattedDate value={item.spendDate} /></StyledTableCell>
+                        <StyledTableCell>{item.category}</StyledTableCell>
+                        <StyledTableCell><button onClick={this.props.onDelete.bind(this, item._id)}>Remove</button></StyledTableCell>
+                    </StyledTableRow>)
+            });
+        }
 
         return (
             <TableContainer component={Paper}>
@@ -70,9 +74,11 @@ class ExpenseEntryListMui extends React.Component {
     getTotal() {
         let result = 0;
 
-        this.state.items.forEach(item => {
-            result += item.amount
-        });
+        if (this.props.isLoaded) {
+            this.state.items.forEach(item => {
+                result += item.amount
+            });
+        }
         return result;
     }
 
