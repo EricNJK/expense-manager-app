@@ -13,11 +13,9 @@ class Pager extends React.Component {
 
     calculate(state, pageNo, remoteItems) {
         let newState = {
-            pageCount: state.pageCount,
-            items: (remoteItems ? remoteItems : state.items),
-            isLoaded: state.isLoaded
+            ...state,
+            items: (remoteItems ? remoteItems : state.items)
         }
-
         let currentPageNum = pageNo;
 
         let totalPages = 0;
@@ -29,20 +27,16 @@ class Pager extends React.Component {
         if (pageNo > totalPages)  // limit page number
             currentPageNum = totalPages;
 
-        let hasPreviousPage = (currentPageNum != 1);  // only 1st page doesn't have previous
-        let hasNextPage = (currentPageNum < totalPages)
+        newState.hasPreviousPage = (currentPageNum != 1);  // only 1st page doesn't have previous
+        newState.hasNextPage = (currentPageNum < totalPages)
 
         let firstIndex = (currentPageNum - 1) * newState.pageCount
         let last = firstIndex + newState.pageCount
 
-        let itemsToShow = newState.items.slice(firstIndex, last)
+        newState.itemsToShow = newState.items.slice(firstIndex, last)
 
-        newState.itemsToShow = itemsToShow
         newState.currentPage = currentPageNum
         newState.totalPages = totalPages
-        newState.hasPreviousPage = hasPreviousPage
-        newState.hasNextPage = hasNextPage
-
         return newState;
     }
 

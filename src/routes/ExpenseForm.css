@@ -1,0 +1,17 @@
+#spaced-children>* {
+    margin: 2px;
+}
+
+.other-buttons {
+    grid-row: 0;
+    grid-column: 3;
+}
+
+.other-buttons button {
+    margin-left: 5px;
+}
+
+.form-buttons {
+    display: grid;
+
+}

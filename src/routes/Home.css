@@ -1,0 +1,35 @@
+html {
+    font-family: sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+p, li, a {
+    font-size: 14px;
+}
+
+nav {
+    padding: 10px;
+}
+
+nav a {
+    width: 100%;
+    padding: 10px;
+    margin: 0;
+    overflow: hidden;
+    background-color: rgb(235, 253, 235);
+}
+
+nav .active {
+    background-color: #8bd9f6
+}
+
+nav a:hover {
+    background-color: rgb(187, 202, 211);
+}
+
+.content {
+    margin: 10px;
+}

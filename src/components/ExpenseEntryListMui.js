@@ -1,8 +1,8 @@
 import React from "react";
 import FormattedDate from "./FormattedDate";
 import FormattedMoney from "./FormattedMoney";
-import { TableContainer, Paper, Table, TableHead, TableBody, TableCell, TableRow } from "@material-ui/core";
-import { withStyles } from "@material-ui/core";
+import { TableContainer, Paper, Table, TableHead, TableBody, TableCell, TableRow } from "@mui/material";
+import "./ExpenseEntryList.css"
 
 class ExpenseEntryListMui extends React.Component {
     constructor(props) {
@@ -13,37 +13,18 @@ class ExpenseEntryListMui extends React.Component {
     }
 
     render() {
-        const StyledTableRow = withStyles((theme) => ({
-            root: {
-                '&:nth-of-type(odd)': {
-                    backgroundColor: theme.palette.action.hover
-                }
-            },
-
-        }))(TableRow);
-
-        const StyledTableCell = withStyles((theme) => ({
-            head: {
-                backgroundColor: theme.palette.common.black,
-                color: theme.palette.common.white
-            },
-            body: {
-                fontSize: 14
-            }
-        }))(TableCell);
-
         let expense_rows = [];
 
         if (this.props.isLoaded) {
             expense_rows = this.state.items.map((item) => {
                 return (
-                    <StyledTableRow key={item._id} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-                        <StyledTableCell>{item.name}</StyledTableCell>
-                        <StyledTableCell><FormattedMoney value={item.amount} /></StyledTableCell>
-                        <StyledTableCell><FormattedDate value={item.spendDate} /></StyledTableCell>
-                        <StyledTableCell>{item.category}</StyledTableCell>
-                        <StyledTableCell><button onClick={this.props.onDelete.bind(this, item._id)}>Remove</button></StyledTableCell>
-                    </StyledTableRow>)
+                    <TableRow key={item._id} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell><FormattedMoney value={item.amount} /></TableCell>
+                        <TableCell><FormattedDate value={item.spendDate} /></TableCell>
+                        <TableCell>{item.category}</TableCell>
+                        <TableCell><button onClick={this.props.onDelete.bind(this, item._id)}>Remove</button></TableCell>
+                    </TableRow>)
             });
         }
 
@@ -52,19 +33,19 @@ class ExpenseEntryListMui extends React.Component {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>Item</StyledTableCell>
-                            <StyledTableCell>Amount</StyledTableCell>
-                            <StyledTableCell>Spend Date</StyledTableCell>
-                            <StyledTableCell>Category</StyledTableCell>
-                            <StyledTableCell>Remove</StyledTableCell>
+                            <TableCell>Item</TableCell>
+                            <TableCell>Amount (Kes)</TableCell>
+                            <TableCell>Spend Date</TableCell>
+                            <TableCell>Category</TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {expense_rows}
-                        <StyledTableRow>
-                            <StyledTableCell colSpan={1} className="total-label">Total</StyledTableCell>
-                            <StyledTableCell colSpan={4} className="total-value">{this.getTotal()}</StyledTableCell>
-                        </StyledTableRow>
+                        <TableRow>
+                            <TableCell colSpan={1} className="total-label">Total</TableCell>
+                            <TableCell colSpan={4} className="total-value">{this.getTotal()}</TableCell>
+                        </TableRow>
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -76,7 +57,9 @@ class ExpenseEntryListMui extends React.Component {
 
         if (this.props.isLoaded) {
             this.state.items.forEach(item => {
-                result += item.amount
+                let amt = parseFloat(item.amount);
+                if (!isNaN(amt))
+                    result += amt;
             });
         }
         return result;
