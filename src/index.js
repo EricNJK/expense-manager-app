@@ -1,7 +1,7 @@
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import ExpenseEntryListMui from './components/ExpenseEntryListMui';
+import ExpenseEntryList from './components/ExpenseEntryList';
 import Pager from './routes/Pager';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './routes/Home';
@@ -19,7 +19,7 @@ ReactDOM.render(
               <Pager pageCount={pageCount}
                 renderList={(pagerState) => (
                   <div>
-                    <ExpenseEntryListMui items={pagerState.items}
+                    <ExpenseEntryList items={pagerState.items}
                       onDelete={pagerState.deleteHandler}
                       isLoaded={pagerState.isLoaded} />
                   </div>)
