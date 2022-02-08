@@ -1,7 +1,6 @@
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import ExpenseEntryList from './components/ExpenseEntryList';
 import Pager from './routes/Pager';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './routes/Home';
@@ -14,22 +13,11 @@ ReactDOM.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} >
-          <Route index={true} element={
-            (
-              <Pager pageCount={pageCount}
-                renderList={(pagerState) => (
-                  <div>
-                    <ExpenseEntryList items={pagerState.items}
-                      onDelete={pagerState.deleteHandler}
-                      isLoaded={pagerState.isLoaded} />
-                  </div>)
-                }
-              />)
-          } />
+          <Route index={true} element={<Pager pageCount={pageCount} />} />
           <Route path="/add" element={<ExpenseForm />} />
         </Route>
       </Routes>
     </BrowserRouter>
-  </StrictMode>
-  , document.getElementById('root')
+  </StrictMode>,
+  document.getElementById('root')
 );

@@ -1,5 +1,6 @@
 const BASE_URL = "http://localhost:8000";
-const new_item_path = "/api/expense/"
+const new_item_path = "/api/expense/";
+const all_items_path = "/api/expenses/";
 
 /** Adds new Expense entry to server
  * 
@@ -29,4 +30,27 @@ export function addExpense(expense, onSuccess, onFailure) {
                 onFailure(responseJson.message)
             }
         });
+}
+
+/**
+ * Deletes expense entry matching id
+ * 
+ * @param expenseId 
+ * @returns Promise 'chained' from network delete request
+ */
+export async function deleteRemoteExpense(expenseId) {
+    const res = await fetch(BASE_URL + new_item_path + expenseId, { method: 'DELETE' });
+    return await res.json();
+}
+
+/**
+ * Gets list of all expenses from server
+ * 
+ * @returns Promise to supply Array of expenses
+ */
+export async function getExpenses() {
+    const response = await fetch(BASE_URL + all_items_path);
+    const data = await response.json();
+    return data.expenses;
+    // todo: .catch(...)
 }

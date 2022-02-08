@@ -1,136 +1,110 @@
-import React from "react";
-import "./Pager.css"
+import { Link } from "@mui/material";
+import { useEffect } from "react";
+import { useState } from "react";
+import ExpenseEntryList from "../components/ExpenseEntryList";
+import { deleteRemoteExpense, getExpenses } from "../data";
+import "./Pager.css";
 
-class Pager extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isLoaded: false,
-            items: [],
-            pageCount: props.pageCount
-        }
-    }
+/**
+ * Component for parsing remote expenses to paginated ExpenseEntryLists
+ * 
+ * @param props Properties including pageCount
+ */
+export default function Pager(props) {
+    // State variables
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [items, setItems] = useState([]);
+    // default 3 items per page
+    const [itemsPerPage, setItemsPerPage] = useState(props.pageCount ? props.pageCount : 3);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [hasPreviousPage, setHasPreviousPage] = useState(false);
+    const [hasNextPage, setHasNextPage] = useState(false);
+    const [itemsToShow, setItemsToShow] = useState([]);
 
-    calculate(state, pageNo, remoteItems) {
-        let newState = {
-            ...state,
-            items: (remoteItems ? remoteItems : state.items)
-        }
-        let currentPageNum = pageNo;
-
-        let totalPages = 0;
-        if (newState.items)
-            totalPages = Math.ceil(newState.items.length / newState.pageCount);
-        else
-            totalPages = Math.ceil(newState.items.length / newState.pageCount);
-
-        if (pageNo > totalPages)  // limit page number
-            currentPageNum = totalPages;
-
-        newState.hasPreviousPage = (currentPageNum != 1);  // only 1st page doesn't have previous
-        newState.hasNextPage = (currentPageNum < totalPages)
-
-        let firstIndex = (currentPageNum - 1) * newState.pageCount
-        let last = firstIndex + newState.pageCount
-
-        newState.itemsToShow = newState.items.slice(firstIndex, last)
-
-        newState.currentPage = currentPageNum
-        newState.totalPages = totalPages
-        return newState;
-    }
-
-    handleClick(pageNo, e) {
+    // Event handlers
+    const handlePageNavClick = (pageNo, e) => {
         e.preventDefault();
-        this.setState((s, _p) => {
-            return this.calculate(s, pageNo)
-        });
+        setCurrentPage(pageNo);  // useEffect hook will call calculate()
     }
 
-    handleDelete(id, e) {
-        e.preventDefault();
-        console.log("Deleting id: " + id);
-        this.deleteRemoteItem(id);
+    const handleDelete = (id, e) => {
+        console.log("Deleting id: " + id)
+        deleteRemoteExpense(id)
+            .finally(() => updateExpenseList(true))  // refresh expenses
+            .catch((reason) => {
+                console.log("handleDelete error", reason);
+                setIsLoaded(false)
+            });
     }
 
-    render() {
-        let pageNumberArray = [];
+    const calculate = () => {
+        let totalPg = Math.ceil(items.length / itemsPerPage);
+        let firstIndex = (currentPage - 1) * itemsPerPage;
+        let lastIndex = firstIndex + itemsPerPage;
 
-        let i = 1;
-        for (; i <= this.state.totalPages; i++) {
-            pageNumberArray.push(i)
+        setTotalPages(totalPg);
+        setHasPreviousPage(currentPage != 1)
+        setHasNextPage(currentPage < totalPg)
+        setItemsToShow(items.slice(firstIndex, lastIndex));
+    }
+
+    const updateExpenseList = (refresh) => {
+        if (refresh || !isLoaded) {
+            getExpenses().then(expenses => {
+                setItems(expenses);
+                setIsLoaded(true);
+            }, (reason) => setIsLoaded(false));
         }
-        const pages = pageNumberArray.map((index) => {
-            return (
-                <a href="#" key={index} onClick={this.handleClick.bind(this, index)}
-                    className={(index == this.state.currentPage) ? "is-active" : ""}>
-                    {index}
-                </a>
-            )
-        });
+    }
 
-        let propsToPass = {
-            items: this.state.itemsToShow,
-            isLoaded: this.state.isLoaded,
-            deleteHandler: this.handleDelete.bind(this)
-        }
+    // Rendering work
+    useEffect(() => {
+        updateExpenseList();  // initial update
+    }, []);
 
+    useEffect(() => {
+        calculate(currentPage);
+    }, [items, currentPage])
+
+    let pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i)
+    }
+
+    const pageNavLinks = pageNumbers.map(pageNum => {
+        return (
+            <Link variant="button" href="#" key={pageNum}
+                className={(pageNum == currentPage) ? "is-active" : ""}
+                onClick={handlePageNavClick.bind(this, pageNum)} >
+                {pageNum}
+            </Link>
+        )
+    })
+
+    // Creates a page with some items
+    const renderList = () => {
         return (
             <div>
-                {this.props.renderList(propsToPass)}
-                <div className="container">
-                    <div className="pagination p1">
-                        <ul>
-                            {this.state.hasPreviousPage ? <a href="#" onClick={this.handleClick.bind(this, this.state.currentPage - 1)}>{"<Previous"}</a> : <span></span>}
-                            {pages}
-                            {this.state.hasNextPage ? <a href="#" onClick={this.handleClick.bind(this, this.state.currentPage + 1)}>{"Next>"}</a> : <span></span>}
-                        </ul>
-                    </div>
+                <ExpenseEntryList items={itemsToShow}
+                    onDelete={handleDelete}
+                    isLoaded={isLoaded} />
+            </div>
+        )
+    }
+
+    return (
+        <div>
+            {renderList()}
+            <div className="container">
+                <div className="pagination p1">
+                    <ul>
+                        {hasPreviousPage ? <a href="#" onClick={handlePageNavClick.bind(this, (currentPage - 1))}>{"<Previous"}</a> : <span></span>}
+                        {pageNavLinks}
+                        {hasNextPage ? <a href="#" onClick={handlePageNavClick.bind(this, (currentPage + 1))}>{"Next>"}</a> : <span></span>}
+                    </ul>
                 </div>
             </div>
-        );
-    }
-
-    // Load from 'apiserver'
-    BASE_URL = "http://localhost:8000";
-    fetchRemoteItems() {
-        console.log("fetchRemoteItems...");
-        fetch(this.BASE_URL + "/api/expenses")
-            .then(res => res.json())
-            .then(resp => {
-                if (resp.expenses) {
-                    this.setItems(resp.expenses)
-                }
-            })
-    }
-
-    setItems(remoteItems) {
-        this.setState((s, p) => this.calculate(s, 1, remoteItems));
-        this.setState((_s, _p) => {
-            return {
-                isLoaded: true
-            }
-        });
-    }
-
-    // lifecycle: Mounted
-    componentDidMount() {
-        this.fetchRemoteItems()
-    }
-
-    deleteRemoteItem(id) {
-        fetch(this.BASE_URL + "/api/expense/" + id, { method: 'DELETE' })
-            .then(res => res.json())
-            .then(() => { this.fetchRemoteItems() },
-                (reason) => {
-                    console.log("deleteRemoteItem error", reason);
-                    this.setState((_s, _p) => {
-                        return {
-                            isLoaded: false
-                        }
-                    });
-                });
-    }
+        </div>
+    )
 }
-
-export default Pager;
