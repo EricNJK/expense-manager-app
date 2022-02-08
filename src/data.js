@@ -10,7 +10,7 @@ const all_items_path = "/api/expenses/";
  * @returns void
  */
 
-export function addExpense(expense, onSuccess, onFailure) {
+export function addRemoteExpense(expense, onSuccess, onFailure) {
     let requestInfo = {
         method: 'POST',
         headers: { "Content-Type": "application/json" },

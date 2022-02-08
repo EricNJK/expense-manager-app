@@ -1,6 +1,6 @@
 import { Button, InputAdornment, Paper, TextField } from "@mui/material";
 import { useState } from "react";
-import { addExpense } from "../data";
+import { addRemoteExpense } from "../data";
 import "./ExpenseForm.css";
 
 export default function ExpenseForm() {
@@ -42,7 +42,7 @@ export default function ExpenseForm() {
             category: expenseCategory ? expenseCategory : "General"
         };
 
-        addExpense(data, onSuccess, onFailure);
+        addRemoteExpense(data, onSuccess, onFailure);
     }
 
     const resetForm = () => {

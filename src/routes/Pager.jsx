@@ -1,8 +1,10 @@
 import { Link } from "@mui/material";
 import { useEffect } from "react";
 import { useState } from "react";
+import { connect } from "react-redux";
+import { addExpense, deleteExpense, setLoadState } from "../actions";
 import ExpenseEntryList from "../components/ExpenseEntryList";
-import { deleteRemoteExpense, getExpenses } from "../data";
+import { getExpenses } from "../data";
 import "./Pager.css";
 
 /**
@@ -10,10 +12,9 @@ import "./Pager.css";
  * 
  * @param props Properties including pageCount
  */
-export default function Pager(props) {
+export function Pager(props) {
     // State variables
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [items, setItems] = useState([]);
+    // isLoaded, items Moved to Redux store
     // default 3 items per page
     const [itemsPerPage, setItemsPerPage] = useState(props.pageCount ? props.pageCount : 3);
     const [currentPage, setCurrentPage] = useState(1);
@@ -28,34 +29,15 @@ export default function Pager(props) {
         setCurrentPage(pageNo);  // useEffect hook will call calculate()
     }
 
-    const handleDelete = (id, e) => {
-        console.log("Deleting id: " + id)
-        deleteRemoteExpense(id)
-            .finally(() => updateExpenseList(true))  // refresh expenses
-            .catch((reason) => {
-                console.log("handleDelete error", reason);
-                setIsLoaded(false)
-            });
-    }
-
     const calculate = () => {
-        let totalPg = Math.ceil(items.length / itemsPerPage);
+        let totalPg = Math.ceil(props.items.length / itemsPerPage);
         let firstIndex = (currentPage - 1) * itemsPerPage;
         let lastIndex = firstIndex + itemsPerPage;
 
         setTotalPages(totalPg);
         setHasPreviousPage(currentPage != 1)
         setHasNextPage(currentPage < totalPg)
-        setItemsToShow(items.slice(firstIndex, lastIndex));
-    }
-
-    const updateExpenseList = (refresh) => {
-        if (refresh || !isLoaded) {
-            getExpenses().then(expenses => {
-                setItems(expenses);
-                setIsLoaded(true);
-            }, (reason) => setIsLoaded(false));
-        }
+        setItemsToShow(props.items.slice(firstIndex, lastIndex));
     }
 
     // Rendering work
@@ -63,9 +45,18 @@ export default function Pager(props) {
         updateExpenseList();  // initial update
     }, []);
 
+    const updateExpenseList = (refresh) => {
+        if (refresh || !props.isLoaded) {
+            getExpenses().then(expenses => {
+                expenses.forEach(e => props.onAddExpense(e))
+                props.setIsLoaded(true);
+            }, (reason) => props.setIsLoaded(false));
+        }
+    }
+
     useEffect(() => {
         calculate(currentPage);
-    }, [items, currentPage])
+    }, [props.items, currentPage])
 
     let pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -87,8 +78,8 @@ export default function Pager(props) {
         return (
             <div>
                 <ExpenseEntryList items={itemsToShow}
-                    onDelete={handleDelete}
-                    isLoaded={isLoaded} />
+                    onDelete={props.onDelete}
+                    isLoaded={props.isLoaded} />
             </div>
         )
     }
@@ -108,3 +99,29 @@ export default function Pager(props) {
         </div>
     )
 }
+
+// Redux impl
+// map redux store state to required props
+const mapStateToProps = (state) => {
+    return {
+        items: state.items,
+        isLoaded: state.isLoaded
+    }
+}
+
+/**
+ * 
+ * @param dispatch Function to dispatch Redux Action to reducers
+ * @returns 
+ */
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onAddExpense: expense => dispatch(addExpense(expense)),
+        onDelete: id => dispatch(deleteExpense(id)),
+        setIsLoaded: b => dispatch(setLoadState(b))
+    }
+}
+
+// higherOrderComponent = connect(...)
+// export higherOrderComponent(Pager)
+export default connect(mapStateToProps, mapDispatchToProps)(Pager)
